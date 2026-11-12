@@ -219,7 +219,15 @@ try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => {}; }c
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let rec = null, recBtn = null;
 function pararMic(){ try{ rec && rec.stop(); }catch(e){} }
+let micBloqueado = false;
+try{ micBloqueado = localStorage.getItem("mic_teclado")==="1"; }catch(e){}
+function usarTeclado(area){
+  try{ localStorage.setItem("mic_teclado","1"); }catch(e){}
+  aviso("En este iPad, dicte con el 🎤 del teclado (junto a la barra espaciadora): toque el cuadro de texto, pulse 🎤 y hable.");
+  area.focus();
+}
 function escuchar(btn, area, lang){
+  if(micBloqueado){ usarTeclado(area); return; }
   if(rec){ const mismo = recBtn===btn; pararMic(); if(mismo) return; }
   try{ speechSynthesis.cancel(); }catch(e){}
   const r = new SR(); rec = r; recBtn = btn;
@@ -235,12 +243,14 @@ function escuchar(btn, area, lang){
     area.value = (previo + finalTxt + parcial).trim();
   };
   r.onerror = ev => {
-    if(ev.error==="not-allowed" || ev.error==="service-not-allowed")
-      aviso("El micrófono no tiene permiso. Actívelo en Ajustes › Safari › Micrófono, o escriba el texto.");
+    if(ev.error==="not-allowed" || ev.error==="service-not-allowed" || ev.error==="audio-capture"){
+      micBloqueado = true;
+      usarTeclado(area);
+    }
   };
   r.onend = () => { btn.classList.remove("on"); if(rec===r){ rec=null; recBtn=null; } };
   btn.classList.add("on");
-  try{ r.start(); }catch(e){ btn.classList.remove("on"); rec=null; }
+  try{ r.start(); }catch(e){ btn.classList.remove("on"); rec=null; micBloqueado=true; usarTeclado(area); }
 }
 
 // ---------- Traducción (Google Cloud Translation) ----------
