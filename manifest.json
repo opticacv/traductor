@@ -1,0 +1,13 @@
+{
+  "name": "Traductor Farmacia San Antonio",
+  "short_name": "Traductor",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#f9fbfb",
+  "theme_color": "#ffffff",
+  "icons": [
+    {"src": "icono-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icono-512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}
